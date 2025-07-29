@@ -1,0 +1,11 @@
+[project]
+name = "daq-lockin"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.3",
+    "nidaqmx>=1.1.0",
+    "seaborn>=0.13.2",
+]

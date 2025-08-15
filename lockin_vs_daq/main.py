@@ -1,18 +1,39 @@
 import threading
 import time
-import numpy as np
+from sr865a import SR865a
+from daq import DAQ
 
-def worker_thread(event:threading.Event, results:list, thread_id):
+def daq_thread(event:threading.Event, results:list, thread_id):
     """
     子線程工作函數：等待訊號後執行任務並回傳結果。
     """
+    daq = DAQ()
+    daq.set_timed_acquisition_params()
     print(f"Thread {thread_id}: 等待主線程發出訊號...")
     event.wait() # 阻塞，直到收到訊號
     print(f"Thread {thread_id}: 收到訊號，開始工作...")
     
     # 這裡執行實際的任務
-    time.sleep(1) # 模擬耗時的 I/O 操作
-    result = f"Thread {thread_id} 的工作已完成，結果為 {thread_id * 5}"
+    result = daq.acquire_timed_data()
+    
+    # 使用鎖來確保資料安全
+    with lock:
+        results.append(result)
+        
+    print(f"Thread {thread_id}: 任務完成，結果已回傳。")
+
+def sr865a_thread(event:threading.Event, results:list, thread_id):
+    """
+    子線程工作函數：等待訊號後執行任務並回傳結果。
+    """
+    sr865a = SR865a()
+    sr865a.set_timed_acquisition_params()
+    print(f"Thread {thread_id}: 等待主線程發出訊號...")
+    event.wait() # 阻塞，直到收到訊號
+    print(f"Thread {thread_id}: 收到訊號，開始工作...")
+    
+    # 這裡執行實際的任務
+    result = sr865a.acquire_timed_data()
     
     # 使用鎖來確保資料安全
     with lock:
@@ -35,17 +56,16 @@ def main_threading():
     results = []
     
     threads = []
-    num_threads = 2
-    
-    # 創建並啟動子線程
-    for i in range(num_threads):
-        t = threading.Thread(target=worker_thread, args=(event, results, i+1))
-        threads.append(t)
-        t.start()
+
+    daq_t = threading.Thread(target=daq_thread, args=(event, results, 1, daq_config))
+    threads.append(daq_t)
+    daq_t.start()
+
+    sr865a_t = threading.Thread(target=sr865a_thread, args=(event, results, 2, sr865a_config))
+    threads.append(sr865a_t)
+    sr865a_t.start()
         
     print("\n主線程: 所有子線程已啟動，等待幾秒鐘後發出訊號...")
-    time.sleep(2) # 模擬一些準備工作
-    
     print("\n主線程: 發出訊號！")
     event.set() # 發出訊號，讓所有子線程開始執行
     

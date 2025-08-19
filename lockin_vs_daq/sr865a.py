@@ -6,7 +6,8 @@ import pyvisa
 import math
 
 class SR865a(Instrument):
-    """SR865a 類別，繼承自 Instrument。
+    """
+    SR865a 類別，繼承自 Instrument。
     用於控制 SR865a 鎖相放大器的行為。
     """
 
@@ -56,6 +57,8 @@ class SR865a(Instrument):
         self.measurement_time = params.get('measurement_time')
         # 設定捕捉模式
         self.inst.capture.config = 'RT'
+        # 設定CH2輸出Theta
+        self.inst.output.ChannelDict['OCH2'] = 2
         # 設定參考光
         self.inst.ref.reference_source = 'external'
         # 設定時間常數

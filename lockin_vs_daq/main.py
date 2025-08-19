@@ -3,12 +3,33 @@ import time
 from sr865a import SR865a
 from daq import DAQ
 
-def daq_thread(event:threading.Event, results:list, thread_id):
+daq_config = {
+    'DAQ_NAME': 'Dev1',
+    'DAQ_CHANNEL': 'ai0',
+}
+
+daq_param = {
+    'SAMPLE_RATE': 1000,  # 每秒採樣點數
+    'SAMPLES_PER_READ': 1000  # 每次從 DAQ 讀取的數據點數
+}
+
+sr865a_config = {
+    'interface_type': 'serial',  # 或 'serial'
+    'port': 'COM3',  # 根據實際情況修改
+}
+
+sr865a_param = {
+    'time_constant': 0.1,  # 時間常數，參考SR865a說明書
+    'rate_divisor_exponent': 0,  # 速率除數指數，範圍介於0~20
+    'measurement_time': 5  # 量測時間，單位為秒
+}
+
+def daq_thread(event:threading.Event, results:list, thread_id, daq_config, daq_param):
     """
     子線程工作函數：等待訊號後執行任務並回傳結果。
     """
-    daq = DAQ()
-    daq.set_timed_acquisition_params()
+    daq = DAQ(**daq_config)
+    daq.set_timed_acquisition_params(**daq_param)
     print(f"Thread {thread_id}: 等待主線程發出訊號...")
     event.wait() # 阻塞，直到收到訊號
     print(f"Thread {thread_id}: 收到訊號，開始工作...")
@@ -19,15 +40,17 @@ def daq_thread(event:threading.Event, results:list, thread_id):
     # 使用鎖來確保資料安全
     with lock:
         results.append(result)
+
+    daq.close_task()
         
     print(f"Thread {thread_id}: 任務完成，結果已回傳。")
 
-def sr865a_thread(event:threading.Event, results:list, thread_id):
+def sr865a_thread(event:threading.Event, results:list, thread_id, sr865a_config, sr865a_param):
     """
     子線程工作函數：等待訊號後執行任務並回傳結果。
     """
-    sr865a = SR865a()
-    sr865a.set_timed_acquisition_params()
+    sr865a = SR865a(**sr865a_config)
+    sr865a.set_timed_acquisition_params(**sr865a_param)
     print(f"Thread {thread_id}: 等待主線程發出訊號...")
     event.wait() # 阻塞，直到收到訊號
     print(f"Thread {thread_id}: 收到訊號，開始工作...")
@@ -57,11 +80,11 @@ def main_threading():
     
     threads = []
 
-    daq_t = threading.Thread(target=daq_thread, args=(event, results, 1, daq_config))
+    daq_t = threading.Thread(target=daq_thread, args=(event, results, 1, daq_config, daq_param))
     threads.append(daq_t)
     daq_t.start()
 
-    sr865a_t = threading.Thread(target=sr865a_thread, args=(event, results, 2, sr865a_config))
+    sr865a_t = threading.Thread(target=sr865a_thread, args=(event, results, 2, sr865a_config, sr865a_param))
     threads.append(sr865a_t)
     sr865a_t.start()
         

@@ -79,7 +79,8 @@ def main_threading():
     daq_results = []
     sr865a_results = []
     
-    threads = [
+    threads = []
+
     daq_t = threading.Thread(target=daq_thread, args=(event, daq_results, 1, daq_config, daq_param))
     threads.append(daq_t)
     daq_t.start()

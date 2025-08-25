@@ -37,7 +37,7 @@ class Helper:
         Returns:
             int: 計算出的buffer大小，單位為KBytes。
         """
-        return ceil(measurement_time * ceil(capture_freq)*4*PointMode.convert(mode)/1024)
+        return ceil(measurement_time * ceil(capture_freq)*4*mode.convert()/1024)
     
     @staticmethod
     def calculate_rate_divisor_capture_rate_pair(max_capture_rate: float) -> dict:
@@ -58,7 +58,7 @@ class Helper:
 
     
     @staticmethod
-    def list_daq_devices()-> list:
+    def list_daq_devices():
         """
         列出所有可用的DAQ設備。
         
@@ -66,10 +66,10 @@ class Helper:
             list: 可用DAQ設備的列表。
         """
         import nidaqmx.system
-        return list(nidaqmx.system.System.local().devices)
+        return list(nidaqmx.system.System.local().devices.device_names)
     
     @staticmethod
-    def list_lockin_devices_visa() -> list:
+    def list_lockin_devices_visa():
         """
         列出所有可用的Lock-in設備（VISA）。
         
@@ -81,7 +81,7 @@ class Helper:
         return list(rm.list_resources())
     
     @staticmethod
-    def list_lockin_devices_serial() -> list:
+    def list_lockin_devices_serial():
         """
         列出所有可用的Lock-in設備（串口）。
         
@@ -89,4 +89,4 @@ class Helper:
             list: 可用Lock-in設備的列表。
         """
         import serial.tools.list_ports
-        return list(serial.tools.list_ports.comports())
+        return [i.name for i in serial.tools.list_ports.comports()]

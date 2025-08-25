@@ -2,6 +2,7 @@ import threading
 import time
 from sr865a import SR865a
 from daq import DAQ
+import matplotlib.pyplot as plt
 
 daq_config = {
     'DAQ_NAME': 'Dev1',
@@ -10,7 +11,7 @@ daq_config = {
 
 daq_param = {
     'SAMPLE_RATE': 39,  # 每秒採樣點數
-    'MEASUREMENT_DURATION': 10  # 量測持續時間(秒)
+    'MEASUREMENT_DURATION': 5  # 量測持續時間(秒)
 }
 
 sr865a_config = {
@@ -64,6 +65,23 @@ def sr865a_thread(event:threading.Event, results:list, thread_id, sr865a_config,
         
     print(f"Thread {thread_id}: 任務完成，結果已回傳。")
 
+def plot_data(sr865_data,daq_data):
+    fig, axes = plt.subplots(1,2,figsize=(10,5))
+    ax1:plt.Axes = axes[0]
+    ax2:plt.Axes = axes[1]
+
+    line1, = ax1.plot(sr865_data[0,:], 'g-', label='DAQ')
+    line2, = ax2.plot(daq_data, 'b-', label='Lock-in')
+
+    ax1.set_ylabel('DAQ Value', color='g')
+    ax2.set_ylabel('Lock-in Value', color='b')
+
+    ax1.set_xticklabels([])  # 隱藏 x 軸 tick label
+    ax2.set_xticklabels([])  # 隱藏 x 軸 tick label
+    plt.tight_layout()
+    fig.show()
+    plt.show()
+
 def main_threading():
     """
     主線程：創建子線程，發出訊號，並收集結果。
@@ -106,6 +124,8 @@ def main_threading():
     print("SR865a收集到的結果:")
     for res in sr865a_results:
         print(f"- {res}")
+
+    plot_data(sr865a_results[0],daq_results[0])
         
     print("\n主線程: 任務完成。")
 

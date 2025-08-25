@@ -1,29 +1,32 @@
 import threading
 import time
-import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import matplotlib.pyplot as plt
 from daq import DAQ
 from sr865a import SR865a
+from collections import deque
 
 daq_config = {
     'DAQ_NAME': 'Dev1',
-    'DAQ_CHANNEL': 'ai0',
+    'DAQ_CHANNEL': 'ai2',
 }
 daq_param = {
     'SAMPLE_RATE': 1000,
-    'SAMPLES_PER_READ': 10  # 假設一次讀10個點
+    'SAMPLES_PER_READ': 1000
 }
 sr865a_config = {
-    'interface': 'serial',
-    'port': 'COM3',
+    'interface_type': 'visa',
+    'port': 'USB0::0xB506::0x2000::004937::INSTR',
 }
 sr865a_param = {}
 
-# 用於儲存即時資料
-daq_data = []
-daq_timestamps = []
-lockin_data = []
-lockin_timestamps = []
+MAX_POINTS = 200  # 只顯示最新 200 筆
+
+# 用於儲存即時資料（只保留最新 MAX_POINTS 筆）
+daq_data = deque(maxlen=MAX_POINTS)
+daq_timestamps = deque(maxlen=MAX_POINTS)
+lockin_data = deque(maxlen=MAX_POINTS)
+lockin_timestamps = deque(maxlen=MAX_POINTS)
 
 def daq_worker(stop_event):
     daq = DAQ(**daq_config)
@@ -35,7 +38,8 @@ def daq_worker(stop_event):
         for i, v in enumerate(data):
             daq_data.append(v)
             daq_timestamps.append(now + i * dt)
-        time.sleep(daq_param['SAMPLES_PER_READ'] * dt)
+        # time.sleep(daq_param['SAMPLES_PER_READ'] * dt)
+    daq.close_task()
 
 def lockin_worker(stop_event):
     lockin = SR865a(**sr865a_config)
@@ -44,7 +48,8 @@ def lockin_worker(stop_event):
         data = lockin.acquire_real_time_data()  # 單一點
         lockin_data.append(data)
         lockin_timestamps.append(time.time())
-        time.sleep(0.05)  # 20Hz
+        # time.sleep(0.05)  # 20Hz
+    lockin.inst.disconnect()
 
 def main():
     stop_event = threading.Event()
@@ -53,16 +58,18 @@ def main():
     t1.start()
     t2.start()
 
-    fig, ax1 = plt.subplots()
-    ax2 = ax1.twinx()
+    fig, axes = plt.subplots(1,2,figsize=(10,5))
+    ax1 = axes[0]
+    ax2 = axes[1]
+
     line1, = ax1.plot([], [], 'g-', label='DAQ')
     line2, = ax2.plot([], [], 'b-', label='Lock-in')
 
-    ax1.set_xlabel('Time (s)')
     ax1.set_ylabel('DAQ Value', color='g')
     ax2.set_ylabel('Lock-in Value', color='b')
-    ax1.legend(loc='upper left')
-    ax2.legend(loc='upper right')
+
+    ax1.set_xticklabels([])  # 隱藏 x 軸 tick label
+    ax2.set_xticklabels([])  # 隱藏 x 軸 tick label
 
     def update(frame):
         if len(daq_timestamps) == 0 or len(lockin_timestamps) == 0:
@@ -77,7 +84,6 @@ def main():
         ax2.relim()
         ax2.autoscale_view()
         return line1, line2
-
     ani = FuncAnimation(fig, update, interval=100)
     plt.title('DAQ & Lock-in Real-time Data')
     plt.tight_layout()

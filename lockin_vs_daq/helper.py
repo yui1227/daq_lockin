@@ -40,7 +40,25 @@ class Helper:
         return ceil(measurement_time * ceil(capture_freq)*4*PointMode.convert(mode)/1024)
     
     @staticmethod
-    def list_daq_devices() -> list:
+    def calculate_rate_divisor_capture_rate_pair(max_capture_rate: float) -> dict:
+        """
+        計算rate_divisor與capture_rate的對應關係。
+        
+        Args:
+            max_capture_rate: 最大擷取頻率，單位為Hz。
+        
+        Returns:
+            dict: 包含rate_divisor與capture_rate的對應關係。
+        """
+        rate_divisor_capture_rate = {}
+        for rate_divisor in range(21):
+            capture_rate = max_capture_rate / (2 ** rate_divisor)
+            rate_divisor_capture_rate[rate_divisor] = capture_rate
+        return rate_divisor_capture_rate
+
+    
+    @staticmethod
+    def list_daq_devices()-> list:
         """
         列出所有可用的DAQ設備。
         
@@ -48,7 +66,7 @@ class Helper:
             list: 可用DAQ設備的列表。
         """
         import nidaqmx.system
-        return nidaqmx.system.System.local().devices
+        return list(nidaqmx.system.System.local().devices)
     
     @staticmethod
     def list_lockin_devices_visa() -> list:
@@ -60,7 +78,7 @@ class Helper:
         """
         import pyvisa
         rm = pyvisa.ResourceManager()
-        return rm.list_resources()
+        return list(rm.list_resources())
     
     @staticmethod
     def list_lockin_devices_serial() -> list:
@@ -71,4 +89,4 @@ class Helper:
             list: 可用Lock-in設備的列表。
         """
         import serial.tools.list_ports
-        return serial.tools.list_ports.comports()
+        return list(serial.tools.list_ports.comports())

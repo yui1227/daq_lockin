@@ -21,13 +21,12 @@ class SR865a(Instrument):
         """
         super().__init__()
         self.config = kwargs
-        self.interface_type = kwargs.get('interface')
+        self.interface_type = kwargs.get('interface_type')
         self.port = kwargs.get('port')
         if self.interface_type == 'serial':
             self.inst = SR865A('serial', self.port)
         elif self.interface_type == 'visa':
-            rm = pyvisa.ResourceManager()
-            self.inst = SR865A('visa', rm.open_resource(self.port))
+            self.inst = SR865A('visa', self.port)
         else:
             raise ValueError("Invalid interface type. Use 'serial' or 'visa'.")
 
@@ -36,6 +35,8 @@ class SR865a(Instrument):
         設定即時資料擷取的參數。
         """
         self.inst.ref.reference_source = 'external'
+        self.inst.output.type['OCH2'] = 'RT'
+        self.inst.output.ChannelDict["OCH2"] = 1
 
     def acquire_real_time_data(self) -> float | np.ndarray:
         """
@@ -58,7 +59,7 @@ class SR865a(Instrument):
         # 設定捕捉模式
         self.inst.capture.config = 'RT'
         # 設定CH2輸出Theta
-        self.inst.output.ChannelDict['OCH2'] = 2
+        self.inst.output.type['OCH2'] = 'RT'
         # 設定參考光
         self.inst.ref.reference_source = 'external'
         # 設定時間常數
@@ -67,12 +68,15 @@ class SR865a(Instrument):
         max = self.inst.capture.max_rate
         self.inst.capture.rate_divisor_exponent = self.rate_divisor_exponent
         current_capture_rate = max/(2**self.rate_divisor_exponent)
-        buffer_size = 16*math.ceil(current_capture_rate)*4*2/1024
+        buffer_size = self.measurement_time*math.ceil(current_capture_rate)*4*2/1024
         self.inst.capture.buffer_size_in_kilobytes = math.ceil(buffer_size)
-        self.wait_time_s = buffer_size*1024/math.ceil(current_capture_rate)/2/4
+        self.wait_time_s = self.inst.capture.buffer_size_in_kilobytes*1024/math.ceil(current_capture_rate)/2/4
+        self.wait_time_s = math.ceil(self.wait_time_s)+2
 
     def acquire_timed_data(self):
         self.inst.capture.start(0,0)
-        time.sleep(self.wait_time_s+2)
+        time.sleep(self.wait_time_s)
+        print(f"等待 {self.wait_time_s} 秒以確保資料擷取完成...")
+        # time.sleep(self.wait_time_s+2)
         data = self.inst.capture.get_all_data()
         return data

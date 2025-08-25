@@ -5,22 +5,22 @@ from daq import DAQ
 
 daq_config = {
     'DAQ_NAME': 'Dev1',
-    'DAQ_CHANNEL': 'ai0',
+    'DAQ_CHANNEL': 'ai3',
 }
 
 daq_param = {
-    'SAMPLE_RATE': 1000,  # 每秒採樣點數
-    'SAMPLES_PER_READ': 1000  # 每次從 DAQ 讀取的數據點數
+    'SAMPLE_RATE': 39,  # 每秒採樣點數
+    'MEASUREMENT_DURATION': 10  # 量測持續時間(秒)
 }
 
 sr865a_config = {
-    'interface_type': 'serial',  # 或 'serial'
-    'port': 'COM3',  # 根據實際情況修改
+    'interface_type': 'visa',  # 或 'serial'
+    'port': 'USB0::0xB506::0x2000::004937::INSTR',  # 根據實際情況修改
 }
 
 sr865a_param = {
-    'time_constant': 0.1,  # 時間常數，參考SR865a說明書
-    'rate_divisor_exponent': 0,  # 速率除數指數，範圍介於0~20
+    'time_constant': 300e-6,  # 時間常數，參考SR865a說明書
+    'rate_divisor_exponent': 12,  # 速率除數指數，範圍介於0~20
     'measurement_time': 5  # 量測時間，單位為秒
 }
 
@@ -76,15 +76,16 @@ def main_threading():
     lock = threading.Lock()
     
     # 創建一個列表，用來收集所有線程的結果
-    results = []
+    daq_results = []
+    sr865a_results = []
     
     threads = []
 
-    daq_t = threading.Thread(target=daq_thread, args=(event, results, 1, daq_config, daq_param))
+    daq_t = threading.Thread(target=daq_thread, args=(event, daq_results, 1, daq_config, daq_param))
     threads.append(daq_t)
     daq_t.start()
 
-    sr865a_t = threading.Thread(target=sr865a_thread, args=(event, results, 2, sr865a_config, sr865a_param))
+    sr865a_t = threading.Thread(target=sr865a_thread, args=(event, sr865a_results, 2, sr865a_config, sr865a_param))
     threads.append(sr865a_t)
     sr865a_t.start()
         
@@ -98,8 +99,12 @@ def main_threading():
         
     print("\n主線程: 所有子線程已結束，開始收集結果...")
     
-    print("收集到的結果:")
-    for res in results:
+    print("DAQ收集到的結果:")
+    for res in daq_results:
+        print(f"- {res}")
+
+    print("SR865a收集到的結果:")
+    for res in sr865a_results:
         print(f"- {res}")
         
     print("\n主線程: 任務完成。")

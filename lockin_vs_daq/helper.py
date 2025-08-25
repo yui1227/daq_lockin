@@ -40,7 +40,7 @@ class Helper:
         return ceil(measurement_time * ceil(capture_freq)*4*mode.convert()/1024)
     
     @staticmethod
-    def calculate_rate_divisor_capture_rate_pair(max_capture_rate: float) -> dict:
+    def calculate_rate_divisor_capture_rate_pair(max_capture_rate: float) -> dict[int, float]:
         """
         計算rate_divisor與capture_rate的對應關係。
         

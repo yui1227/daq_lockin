@@ -11,3 +11,7 @@ pg.ipynb
 
 # Virtual environments
 .venv
+
+# data files
+sr865a_*.txt
+daq_*.txt

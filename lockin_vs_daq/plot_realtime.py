@@ -1,26 +1,29 @@
 import threading
 import time
+import matplotlib
+matplotlib.use('TkAgg')
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
 from daq import DAQ
+from helper import Helper
 from sr865a import SR865a
 from collections import deque
 
 daq_config = {
-    'DAQ_NAME': 'Dev1',
-    'DAQ_CHANNEL': 'ai2',
+    'DAQ_NAME': Helper.list_daq_devices()[0],
+    'DAQ_CHANNEL': 'ai3',
 }
 daq_param = {
-    'SAMPLE_RATE': 1000,
-    'SAMPLES_PER_READ': 1000
+    'SAMPLE_RATE': 152,
+    'SAMPLES_PER_READ': 35
 }
 sr865a_config = {
     'interface_type': 'visa',
-    'port': 'USB0::0xB506::0x2000::004937::INSTR',
+    'port': Helper.list_lockin_devices_visa()[0],
 }
 sr865a_param = {}
 
-MAX_POINTS = 200  # 只顯示最新 200 筆
+MAX_POINTS = 1000  # 只顯示最新 200 筆
 
 # 用於儲存即時資料（只保留最新 MAX_POINTS 筆）
 daq_data = deque(maxlen=MAX_POINTS)
@@ -31,10 +34,10 @@ lockin_timestamps = deque(maxlen=MAX_POINTS)
 def daq_worker(stop_event):
     daq = DAQ(**daq_config)
     daq.set_real_time_acquisition_params(**daq_param)
+    dt = 1.0 / daq_param['SAMPLE_RATE']
     while not stop_event.is_set():
         data = daq.acquire_real_time_data()  # 回傳多個點
         now = time.time()
-        dt = 1.0 / daq_param['SAMPLE_RATE']
         for i, v in enumerate(data):
             daq_data.append(v)
             daq_timestamps.append(now + i * dt)
@@ -59,14 +62,17 @@ def main():
     t2.start()
 
     fig, axes = plt.subplots(1,2,figsize=(10,5))
-    ax1 = axes[0]
-    ax2 = axes[1]
+    ax1:plt.Axes = axes[0]
+    ax2:plt.Axes = axes[1]
 
-    line1, = ax1.plot([], [], 'g-', label='DAQ')
-    line2, = ax2.plot([], [], 'b-', label='Lock-in')
+    ax1.set_ylim(-10, 10)
+    ax2.set_ylim(-180, 180)
 
-    ax1.set_ylabel('DAQ Value', color='g')
-    ax2.set_ylabel('Lock-in Value', color='b')
+    line1, = ax1.plot([], [], 'g.', label='DAQ')
+    line2, = ax2.plot([], [], 'b.', label='Lock-in')
+
+    ax1.set_ylabel('DAQ Value (V)', color='g')
+    ax2.set_ylabel('Lock-in Value (Degree)', color='b')
 
     ax1.set_xticklabels([])  # 隱藏 x 軸 tick label
     ax2.set_xticklabels([])  # 隱藏 x 軸 tick label
@@ -84,8 +90,7 @@ def main():
         ax2.relim()
         ax2.autoscale_view()
         return line1, line2
-    ani = FuncAnimation(fig, update, interval=100)
-    plt.title('DAQ & Lock-in Real-time Data')
+    ani = FuncAnimation(fig, update, interval=10, cache_frame_data=False)
     plt.tight_layout()
     plt.show()
 

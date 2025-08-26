@@ -36,7 +36,7 @@ class DAQ(Instrument):
             'SAMPLES_PER_READ')   # 每次從 DAQ 讀取的數據點數
         self.task = nidaqmx.Task()
         self.task.ai_channels.add_ai_voltage_chan(
-            f"{self.DAQ_NAME}/{self.DAQ_CHANNEL}")
+            f"{self.DAQ_NAME}/{self.DAQ_CHANNEL}",min_val=-10.0, max_val=10.0)
         # 配置採樣時序
         self.task.timing.cfg_samp_clk_timing(
             rate=self.SAMPLE_RATE,
@@ -82,7 +82,7 @@ class DAQ(Instrument):
             self.SAMPLE_RATE * self.MEASUREMENT_DURATION)
         self.task = nidaqmx.Task()
         self.task.ai_channels.add_ai_voltage_chan(
-            f"{self.DAQ_NAME}/{self.DAQ_CHANNEL}")
+            f"{self.DAQ_NAME}/{self.DAQ_CHANNEL}",min_val=-10.0, max_val=10.0)
         self.task.timing.cfg_samp_clk_timing(
             rate=self.SAMPLE_RATE,
             sample_mode=AcquisitionType.FINITE,

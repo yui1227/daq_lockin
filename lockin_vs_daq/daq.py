@@ -22,7 +22,6 @@ class DAQ(Instrument):
         self.config = kwargs
         self.DAQ_NAME = kwargs.get('DAQ_NAME')
         self.DAQ_CHANNEL = kwargs.get('DAQ_CHANNEL')
-        self.task = nidaqmx.Task()
 
     def set_real_time_acquisition_params(self, **params):
         """
@@ -37,7 +36,7 @@ class DAQ(Instrument):
             'SAMPLES_PER_READ')   # 每次從 DAQ 讀取的數據點數
         self.task = nidaqmx.Task()
         self.task.ai_channels.add_ai_voltage_chan(
-            f"{self.DAQ_NAME}/{self.DAQ_CHANNEL}")
+            f"{self.DAQ_NAME}/{self.DAQ_CHANNEL}",min_val=-10.0, max_val=10.0)
         # 配置採樣時序
         self.task.timing.cfg_samp_clk_timing(
             rate=self.SAMPLE_RATE,
@@ -72,7 +71,7 @@ class DAQ(Instrument):
 
         Args:
             SAMPLE_RATE: 取樣率(Hz)。
-            SAMPLES_PER_READ: 每次讀取點數。
+            MEASUREMENT_DURATION: 量測持續時間(秒)。
         """
         self.SAMPLE_RATE = params.get("SAMPLE_RATE")             # 採樣率 (Hz)
         self.MEASUREMENT_DURATION = params.get(
@@ -82,6 +81,8 @@ class DAQ(Instrument):
         self.number_of_samples = int(
             self.SAMPLE_RATE * self.MEASUREMENT_DURATION)
         self.task = nidaqmx.Task()
+        self.task.ai_channels.add_ai_voltage_chan(
+            f"{self.DAQ_NAME}/{self.DAQ_CHANNEL}",min_val=-10.0, max_val=10.0)
         self.task.timing.cfg_samp_clk_timing(
             rate=self.SAMPLE_RATE,
             sample_mode=AcquisitionType.FINITE,

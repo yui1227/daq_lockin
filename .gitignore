@@ -5,6 +5,13 @@ build/
 dist/
 wheels/
 *.egg-info
+# playground.py or playground.ipynb
+pg.py
+pg.ipynb
 
 # Virtual environments
 .venv
+
+# data files
+sr865a_*.txt
+daq_*.txt

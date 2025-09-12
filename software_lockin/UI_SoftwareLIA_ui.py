@@ -16,21 +16,21 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QGroupBox,
-    QHBoxLayout, QLabel, QListView, QMainWindow,
-    QPushButton, QSizePolicy, QSpinBox, QVBoxLayout,
-    QWidget)
+    QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
+    QMainWindow, QPushButton, QSizePolicy, QSpinBox,
+    QVBoxLayout, QWidget)
 
 class Ui_SoftwareLIA(object):
     def setupUi(self, SoftwareLIA):
         if not SoftwareLIA.objectName():
             SoftwareLIA.setObjectName(u"SoftwareLIA")
-        SoftwareLIA.resize(1046, 819)
+        SoftwareLIA.resize(1070, 819)
         self.centralwidget = QWidget(SoftwareLIA)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout_2 = QHBoxLayout(self.centralwidget)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.verticalLayout_4 = QVBoxLayout()
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.verticalLayout_5 = QVBoxLayout()
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.groupBox = QGroupBox(self.centralwidget)
         self.groupBox.setObjectName(u"groupBox")
         self.verticalLayout = QVBoxLayout(self.groupBox)
@@ -46,44 +46,75 @@ class Ui_SoftwareLIA(object):
         self.verticalLayout.addWidget(self.cmbDAQ)
 
 
-        self.verticalLayout_4.addWidget(self.groupBox)
+        self.verticalLayout_5.addWidget(self.groupBox)
 
         self.groupBox_2 = QGroupBox(self.centralwidget)
         self.groupBox_2.setObjectName(u"groupBox_2")
-        self.verticalLayout_2 = QVBoxLayout(self.groupBox_2)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_4 = QVBoxLayout(self.groupBox_2)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.label_2 = QLabel(self.groupBox_2)
         self.label_2.setObjectName(u"label_2")
 
-        self.verticalLayout_2.addWidget(self.label_2)
+        self.verticalLayout_4.addWidget(self.label_2)
 
         self.dsbSamplingRate = QDoubleSpinBox(self.groupBox_2)
         self.dsbSamplingRate.setObjectName(u"dsbSamplingRate")
 
-        self.verticalLayout_2.addWidget(self.dsbSamplingRate)
+        self.verticalLayout_4.addWidget(self.dsbSamplingRate)
 
         self.label_3 = QLabel(self.groupBox_2)
         self.label_3.setObjectName(u"label_3")
 
-        self.verticalLayout_2.addWidget(self.label_3)
+        self.verticalLayout_4.addWidget(self.label_3)
 
-        self.sbCutOff = QSpinBox(self.groupBox_2)
-        self.sbCutOff.setObjectName(u"sbCutOff")
+        self.dsbTimeConstant = QDoubleSpinBox(self.groupBox_2)
+        self.dsbTimeConstant.setObjectName(u"dsbTimeConstant")
 
-        self.verticalLayout_2.addWidget(self.sbCutOff)
+        self.verticalLayout_4.addWidget(self.dsbTimeConstant)
 
         self.label_4 = QLabel(self.groupBox_2)
         self.label_4.setObjectName(u"label_4")
 
-        self.verticalLayout_2.addWidget(self.label_4)
+        self.verticalLayout_4.addWidget(self.label_4)
 
-        self.sbFilterPole = QSpinBox(self.groupBox_2)
-        self.sbFilterPole.setObjectName(u"sbFilterPole")
+        self.sbFilterOrder = QSpinBox(self.groupBox_2)
+        self.sbFilterOrder.setObjectName(u"sbFilterOrder")
 
-        self.verticalLayout_2.addWidget(self.sbFilterPole)
+        self.verticalLayout_4.addWidget(self.sbFilterOrder)
+
+        self.groupBox_5 = QGroupBox(self.groupBox_2)
+        self.groupBox_5.setObjectName(u"groupBox_5")
+        self.verticalLayout_2 = QVBoxLayout(self.groupBox_5)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.label_7 = QLabel(self.groupBox_5)
+        self.label_7.setObjectName(u"label_7")
+
+        self.verticalLayout_2.addWidget(self.label_7)
+
+        self.dsbRefFreq = QDoubleSpinBox(self.groupBox_5)
+        self.dsbRefFreq.setObjectName(u"dsbRefFreq")
+        self.dsbRefFreq.setMaximum(1000000000.000000000000000)
+
+        self.verticalLayout_2.addWidget(self.dsbRefFreq)
+
+        self.label_8 = QLabel(self.groupBox_5)
+        self.label_8.setObjectName(u"label_8")
+
+        self.verticalLayout_2.addWidget(self.label_8)
+
+        self.dsbRefInitPhase = QDoubleSpinBox(self.groupBox_5)
+        self.dsbRefInitPhase.setObjectName(u"dsbRefInitPhase")
+        self.dsbRefInitPhase.setDecimals(6)
+        self.dsbRefInitPhase.setMaximum(6.283185000000000)
+        self.dsbRefInitPhase.setSingleStep(0.100000000000000)
+
+        self.verticalLayout_2.addWidget(self.dsbRefInitPhase)
 
 
-        self.verticalLayout_4.addWidget(self.groupBox_2)
+        self.verticalLayout_4.addWidget(self.groupBox_5)
+
+
+        self.verticalLayout_5.addWidget(self.groupBox_2)
 
         self.groupBox_3 = QGroupBox(self.centralwidget)
         self.groupBox_3.setObjectName(u"groupBox_3")
@@ -120,16 +151,16 @@ class Ui_SoftwareLIA(object):
 
         self.verticalLayout_3.addLayout(self.horizontalLayout)
 
-        self.lstInputSignalView = QListView(self.groupBox_3)
-        self.lstInputSignalView.setObjectName(u"lstInputSignalView")
+        self.lstSelectedInputSignals = QListWidget(self.groupBox_3)
+        self.lstSelectedInputSignals.setObjectName(u"lstSelectedInputSignals")
 
-        self.verticalLayout_3.addWidget(self.lstInputSignalView)
-
-
-        self.verticalLayout_4.addWidget(self.groupBox_3)
+        self.verticalLayout_3.addWidget(self.lstSelectedInputSignals)
 
 
-        self.horizontalLayout_2.addLayout(self.verticalLayout_4)
+        self.verticalLayout_5.addWidget(self.groupBox_3)
+
+
+        self.horizontalLayout_2.addLayout(self.verticalLayout_5)
 
         self.groupBox_4 = QGroupBox(self.centralwidget)
         self.groupBox_4.setObjectName(u"groupBox_4")
@@ -155,8 +186,11 @@ class Ui_SoftwareLIA(object):
         self.label.setText(QCoreApplication.translate("SoftwareLIA", u"\u8acb\u9078\u64c7DAQ\uff1a", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("SoftwareLIA", u"\u9396\u76f8\u653e\u5927\u5668\u8a2d\u5b9a", None))
         self.label_2.setText(QCoreApplication.translate("SoftwareLIA", u"\u53d6\u6a23\u983b\u7387(Hz)\uff1a", None))
-        self.label_3.setText(QCoreApplication.translate("SoftwareLIA", u"\u4f4e\u901a\u6ffe\u6ce2\u5668\u622a\u6b62\u983b\u7387(Hz)\uff1a", None))
+        self.label_3.setText(QCoreApplication.translate("SoftwareLIA", u"\u6642\u9593\u5e38\u6578(s)\uff1a", None))
         self.label_4.setText(QCoreApplication.translate("SoftwareLIA", u"\u6ffe\u6ce2\u5668\u968e\u6578", None))
+        self.groupBox_5.setTitle(QCoreApplication.translate("SoftwareLIA", u"\u53c3\u8003\u8a0a\u865f\u8a2d\u5b9a(\u53ea\u5728\u9078\u64c7Internal\u6709\u6548)", None))
+        self.label_7.setText(QCoreApplication.translate("SoftwareLIA", u"\u5167\u90e8\u53c3\u8003\u8a0a\u865f\u983b\u7387(Hz)\uff1a", None))
+        self.label_8.setText(QCoreApplication.translate("SoftwareLIA", u"\u5167\u90e8\u53c3\u8003\u8a0a\u865f\u521d\u59cb\u76f8\u4f4d(rad)\uff1a", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("SoftwareLIA", u"\u8a0a\u865f\u8a2d\u5b9a", None))
         self.label_5.setText(QCoreApplication.translate("SoftwareLIA", u"\u53c3\u8003\u8a0a\u865f\uff1a", None))
         self.label_6.setText(QCoreApplication.translate("SoftwareLIA", u"\u8f38\u5165\u8a0a\u865f\uff1a", None))

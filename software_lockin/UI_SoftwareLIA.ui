@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1046</width>
+    <width>1070</width>
     <height>819</height>
    </rect>
   </property>
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
        <widget class="QGroupBox" name="groupBox">
         <property name="title">
@@ -41,7 +41,7 @@
         <property name="title">
          <string>鎖相放大器設定</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
@@ -55,12 +55,12 @@
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>低通濾波器截止頻率(Hz)：</string>
+            <string>時間常數(s)：</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="sbCutOff"/>
+          <widget class="QDoubleSpinBox" name="dsbTimeConstant"/>
          </item>
          <item>
           <widget class="QLabel" name="label_4">
@@ -70,7 +70,50 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="sbFilterPole"/>
+          <widget class="QSpinBox" name="sbFilterOrder"/>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_5">
+           <property name="title">
+            <string>參考訊號設定(只在選擇Internal有效)</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>內部參考訊號頻率(Hz)：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="dsbRefFreq">
+              <property name="maximum">
+               <double>1000000000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>內部參考訊號初始相位(rad)：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="dsbRefInitPhase">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+              <property name="maximum">
+               <double>6.283185000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -119,7 +162,7 @@
           </layout>
          </item>
          <item>
-          <widget class="QListView" name="lstInputSignalView"/>
+          <widget class="QListWidget" name="lstSelectedInputSignals"/>
          </item>
         </layout>
        </widget>

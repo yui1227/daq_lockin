@@ -20,6 +20,8 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QGroupBo
     QMainWindow, QPushButton, QSizePolicy, QSpinBox,
     QVBoxLayout, QWidget)
 
+from pyqtgraph import PlotWidget
+
 class Ui_SoftwareLIA(object):
     def setupUi(self, SoftwareLIA):
         if not SoftwareLIA.objectName():
@@ -27,8 +29,8 @@ class Ui_SoftwareLIA(object):
         SoftwareLIA.resize(1070, 819)
         self.centralwidget = QWidget(SoftwareLIA)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.horizontalLayout_2 = QHBoxLayout(self.centralwidget)
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_3 = QHBoxLayout(self.centralwidget)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.verticalLayout_5 = QVBoxLayout()
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.groupBox = QGroupBox(self.centralwidget)
@@ -159,8 +161,23 @@ class Ui_SoftwareLIA(object):
 
         self.verticalLayout_5.addWidget(self.groupBox_3)
 
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.btnStartRealtime = QPushButton(self.centralwidget)
+        self.btnStartRealtime.setObjectName(u"btnStartRealtime")
 
-        self.horizontalLayout_2.addLayout(self.verticalLayout_5)
+        self.horizontalLayout_2.addWidget(self.btnStartRealtime)
+
+        self.btnStartRecordSave = QPushButton(self.centralwidget)
+        self.btnStartRecordSave.setObjectName(u"btnStartRecordSave")
+
+        self.horizontalLayout_2.addWidget(self.btnStartRecordSave)
+
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_2)
+
+
+        self.horizontalLayout_3.addLayout(self.verticalLayout_5)
 
         self.groupBox_4 = QGroupBox(self.centralwidget)
         self.groupBox_4.setObjectName(u"groupBox_4")
@@ -170,8 +187,15 @@ class Ui_SoftwareLIA(object):
         sizePolicy.setHeightForWidth(self.groupBox_4.sizePolicy().hasHeightForWidth())
         self.groupBox_4.setSizePolicy(sizePolicy)
         self.groupBox_4.setMinimumSize(QSize(800, 800))
+        self.horizontalLayout_4 = QHBoxLayout(self.groupBox_4)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.graphicsView = PlotWidget(self.groupBox_4)
+        self.graphicsView.setObjectName(u"graphicsView")
 
-        self.horizontalLayout_2.addWidget(self.groupBox_4)
+        self.horizontalLayout_4.addWidget(self.graphicsView)
+
+
+        self.horizontalLayout_3.addWidget(self.groupBox_4)
 
         SoftwareLIA.setCentralWidget(self.centralwidget)
 
@@ -195,6 +219,8 @@ class Ui_SoftwareLIA(object):
         self.label_5.setText(QCoreApplication.translate("SoftwareLIA", u"\u53c3\u8003\u8a0a\u865f\uff1a", None))
         self.label_6.setText(QCoreApplication.translate("SoftwareLIA", u"\u8f38\u5165\u8a0a\u865f\uff1a", None))
         self.btnAddInputSignal.setText(QCoreApplication.translate("SoftwareLIA", u"+", None))
+        self.btnStartRealtime.setText(QCoreApplication.translate("SoftwareLIA", u"\u5373\u6642\u91cf\u6e2c", None))
+        self.btnStartRecordSave.setText(QCoreApplication.translate("SoftwareLIA", u"\u8a18\u9304\u4e26\u5b58\u6a94", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("SoftwareLIA", u"\u5373\u6642\u7e6a\u5716", None))
     # retranslateUi
 

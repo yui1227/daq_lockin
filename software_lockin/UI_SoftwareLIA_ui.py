@@ -220,7 +220,7 @@ class Ui_SoftwareLIA(object):
         self.label_6.setText(QCoreApplication.translate("SoftwareLIA", u"\u8f38\u5165\u8a0a\u865f\uff1a", None))
         self.btnAddInputSignal.setText(QCoreApplication.translate("SoftwareLIA", u"+", None))
         self.btnStartRealtime.setText(QCoreApplication.translate("SoftwareLIA", u"\u5373\u6642\u91cf\u6e2c", None))
-        self.btnStartRecordSave.setText(QCoreApplication.translate("SoftwareLIA", u"\u8a18\u9304\u4e26\u5b58\u6a94", None))
+        self.btnStartRecordSave.setText(QCoreApplication.translate("SoftwareLIA", u"\u8a2d\u5b9a\u6642\u9593\u4e26\u91cf\u6e2c", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("SoftwareLIA", u"\u5373\u6642\u7e6a\u5716", None))
     # retranslateUi
 

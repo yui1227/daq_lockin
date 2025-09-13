@@ -179,7 +179,7 @@
         <item>
          <widget class="QPushButton" name="btnStartRecordSave">
           <property name="text">
-           <string>記錄並存檔</string>
+           <string>設定時間並量測</string>
           </property>
          </widget>
         </item>

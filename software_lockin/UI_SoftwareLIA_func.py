@@ -11,6 +11,7 @@ from DAQWorker import DAQWorker
 
 class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
     StartRealTime = Signal(dict)
+    StopRealTime = Signal()
     StartRecord = Signal(dict)
 
     def __init__(self, parent=None):
@@ -21,7 +22,8 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
 
         self.worker = DAQWorker()
         self.daq_thread = QThread(self)
-        self.StartRealTime.connect(self.worker.get_read_time_data)
+        self.StartRealTime.connect(self.worker.get_real_time_data)
+        self.StopRealTime.connect(self.worker.stop_real_time)
         self.StartRecord.connect(self.worker.get_record_data)
         self.worker.data_acquired.connect(self.plot_data)
         self.worker.moveToThread(self.daq_thread)
@@ -136,10 +138,20 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         self.StartRealTime.emit(sample_setting)
 
     def start_record(self):
-        pass
+        sample_setting = {
+            "SAMPLE_RATE": self.dsbSamplingRate.value(),
+            "MEASUREMENT_DURATION": 0,
+            "ref_source": self.cmbRefSignal.currentText(),
+            "source": self.get_selected_input(),
+        }
+        self.StartRecord.emit(sample_setting)
 
     def plot_data(self, data: np.ndarray):
-        self.graphicsView.plotItem.plot(data[:,1])
+        if data.ndim ==1:
+            self.graphicsView.plotItem.plot(data)
+        else:
+            for col in data.shape[1]:
+                self.graphicsView.plotItem.plot(data[:,col])
 
     def closeEvent(self, event):
         return super().closeEvent(event)

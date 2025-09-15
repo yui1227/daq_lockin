@@ -34,7 +34,8 @@ class LockInAmplifier:
     def process(self, signal, t, ref_signal):
         """
         signal: 輸入訊號 (numpy array)
-        ref: 參考訊號 (numpy array，和 signal 長度相同)
+        t: 時間
+        ref_signal: 參考訊號 (numpy array，和 signal 長度相同)
         return: dict 包含 I, Q, R, theta
         """
         if len(signal) != len(ref_signal):

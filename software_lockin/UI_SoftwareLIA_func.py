@@ -37,8 +37,8 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         self.lia_worker.data_calculated.connect(self.plot_data)
         # 放在這邊是因為有一些鎖相數值需要填到視窗
         self.initUi()
-
         self.lia_worker.moveToThread(self.lia_thread)
+
         self.daq_thread.start()
         self.lia_thread.start()
         self.color_list = [
@@ -92,7 +92,7 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         self.dsbRefFreq.valueChanged.connect(
             lambda value: self.spinBoxChanged('ref_freq', value))
         self.dsbRefPhase.valueChanged.connect(
-            lambda value: self.spinBoxChanged('ref_freq', value))
+            lambda value: self.spinBoxChanged('ref_phase', value))
 
         self.lstSelectedInputSignals.itemDoubleClicked.connect(
             self.remove_item_double_click)

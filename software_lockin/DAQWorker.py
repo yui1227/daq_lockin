@@ -71,4 +71,4 @@ class DAQWorker(QObject):
         data_array = np.array(acquired_data)
         task.stop()
         task.close()
-        return data_array
+        self.data_acquired.emit(data_array)

@@ -100,7 +100,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="dsbRefInitPhase">
+             <widget class="QDoubleSpinBox" name="dsbRefPhase">
               <property name="decimals">
                <number>6</number>
               </property>

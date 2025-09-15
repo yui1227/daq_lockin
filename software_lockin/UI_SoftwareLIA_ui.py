@@ -104,13 +104,13 @@ class Ui_SoftwareLIA(object):
 
         self.verticalLayout_2.addWidget(self.label_8)
 
-        self.dsbRefInitPhase = QDoubleSpinBox(self.groupBox_5)
-        self.dsbRefInitPhase.setObjectName(u"dsbRefInitPhase")
-        self.dsbRefInitPhase.setDecimals(6)
-        self.dsbRefInitPhase.setMaximum(6.283185000000000)
-        self.dsbRefInitPhase.setSingleStep(0.100000000000000)
+        self.dsbRefPhase = QDoubleSpinBox(self.groupBox_5)
+        self.dsbRefPhase.setObjectName(u"dsbRefPhase")
+        self.dsbRefPhase.setDecimals(6)
+        self.dsbRefPhase.setMaximum(6.283185000000000)
+        self.dsbRefPhase.setSingleStep(0.100000000000000)
 
-        self.verticalLayout_2.addWidget(self.dsbRefInitPhase)
+        self.verticalLayout_2.addWidget(self.dsbRefPhase)
 
 
         self.verticalLayout_4.addWidget(self.groupBox_5)

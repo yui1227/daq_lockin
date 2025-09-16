@@ -140,7 +140,7 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         self.cmbInputSignal.addItems(
             [ch for ch in self.get_all_available_input() if (ch != current_ref) and (ch != 'Internal')])
         
-        ref_source = 'external' if self.cmbRefSignal.currentText != 'Internal' else 'internal'
+        ref_source = 'external' if self.cmbRefSignal.currentText() != 'Internal' else 'internal'
         self.LockinSettingChanged.emit(('ref_source',ref_source))
 
     def remove_item_double_click(self, item: QListWidgetItem):
@@ -175,13 +175,13 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         }
         self.StartRecord.emit(sample_setting)
 
-    def plot_data(self, data: np.ndarray):
-        if data.ndim == 1:
-            self.curves[0].setData(data)
+    def plot_data(self, data: dict[str,np.ndarray]):
+        if data["theta"].ndim == 1:
+            self.curves[0].setData(data["theta"])
         else:
             start = 0 if self.cmbRefSignal.currentText() == 'Internal' else 1
-            for row in range(start, data.shape[0]):
-                self.curves[row-start].setData(data[row, :])
+            for row in range(start, data["theta"].shape[0]):
+                self.curves[row-start].setData(data["theta"][row, :])
 
     def closeEvent(self, event: QCloseEvent):
         self.StopRealTime.emit()

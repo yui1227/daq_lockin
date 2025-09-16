@@ -63,7 +63,7 @@ class DAQWorker(QObject):
             sample_mode=AcquisitionType.FINITE,
             samps_per_chan=number_of_samples
         )
-        
+        task.start()
         task.wait_until_done(
             timeout=data["MEASUREMENT_DURATION"] + 2.0)  # 給予額外的時間裕度
         acquired_data = task.read(

@@ -5,7 +5,7 @@ import numpy as np
 
 
 class DAQWorker(QObject):
-    data_acquired = Signal(np.ndarray)
+    data_acquired = Signal(np.ndarray,str)
 
     def __init__(self, /, parent=None):
         super(DAQWorker, self).__init__(parent)
@@ -36,7 +36,7 @@ class DAQWorker(QObject):
             if not isinstance(new_data, (list, np.ndarray)):
                 new_data = [new_data]
             new_data = np.array(new_data)
-            self.data_acquired.emit(new_data)
+            self.data_acquired.emit(new_data,"realtime")
         task.stop()
         task.close()
         
@@ -71,4 +71,4 @@ class DAQWorker(QObject):
         data_array = np.array(acquired_data)
         task.stop()
         task.close()
-        self.data_acquired.emit(data_array)
+        self.data_acquired.emit(data_array,"record")

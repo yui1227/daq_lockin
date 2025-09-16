@@ -28,25 +28,40 @@ class LockInAmplifier:
         b, a = butter(self.filter_order, normal_cutoff, btype='low')
         return b, a
 
-    def _lowpass(self, data):
-        return lfilter(self.b, self.a, data)
+    def _lowpass(self, data: np.ndarray, mode: str):
+        if mode == "realtime":
+            return lfilter(self.b, self.a, data)
+        elif mode == "record":
+            return filtfilt(self.b, self.a, data)
 
-    def process(self, signal, t, ref_signal):
+    def process(self, signal, ref_signal, mode):
         """
         signal: 輸入訊號 (numpy array)
-        t: 時間
         ref_signal: 參考訊號 (numpy array，和 signal 長度相同)
+        mode: 可為"realtime" or "record"
         return: dict 包含 I, Q, R, theta
         """
         if len(signal) != len(ref_signal):
             raise ValueError("signal 與 ref 必須長度相同")
 
+        N = len(signal)
+
         if self.ref_source == 'internal':
-            ref_cos = np.cos(2*np.pi*self.ref_freq*t + self.ref_phase)
-            ref_sin = np.sin(2*np.pi*self.ref_freq*t + self.ref_phase)
+            if mode == 'realtime':
+                phase_inc = 2*np.pi*self.ref_freq/self.fs
+                idx = np.arange(N)
+                phase = self.ref_phase + phase_inc * idx
+                ref_cos = np.cos(phase)
+                ref_sin = np.sin(phase)
+                self.ref_phase = (phase[-1]+phase_inc) % (2*np.pi)
+            elif mode == "record":
+                t = np.arange(N)/self.fs
+                ref_cos = np.cos(2*np.pi*self.ref_freq*t + self.ref_phase)
+                ref_sin = np.sin(2*np.pi*self.ref_freq*t + self.ref_phase)
         elif self.ref_source == 'external':
             if ref_signal is None:
-                raise ValueError("External reference source requires ref_signal input")
+                raise ValueError(
+                    "External reference source requires ref_signal input")
             # Hilbert transform 產生正交參考訊號
             analytic_ref = hilbert(ref_signal)
             ref_cos = np.real(analytic_ref)   # 同相
@@ -57,8 +72,8 @@ class LockInAmplifier:
         Q_raw = signal * ref_sin
 
         # 低通濾波
-        I = self._lowpass(I_raw)
-        Q = self._lowpass(Q_raw)
+        I = self._lowpass(I_raw, mode)
+        Q = self._lowpass(Q_raw, mode)
 
         # 幅度與相位
         R = np.sqrt(I**2 + Q**2)

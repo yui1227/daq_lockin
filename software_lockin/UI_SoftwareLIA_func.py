@@ -28,7 +28,6 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         self.StopRealTime.connect(self.daq_worker.stop_real_time)
         self.StartRecord.connect(self.daq_worker.get_record_data)
         # self.daq_worker.data_acquired.connect(self.plot_data)
-        self.daq_worker.moveToThread(self.daq_thread)
 
         self.lia_worker = LIAWorker()
         self.lia_thread = QThread(self)
@@ -37,8 +36,9 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         self.lia_worker.data_calculated.connect(self.plot_data)
         # 放在這邊是因為有一些鎖相數值需要填到視窗
         self.initUi()
-        self.lia_worker.moveToThread(self.lia_thread)
 
+        self.daq_worker.moveToThread(self.daq_thread)
+        self.lia_worker.moveToThread(self.lia_thread)
         self.daq_thread.start()
         self.lia_thread.start()
         self.color_list = [

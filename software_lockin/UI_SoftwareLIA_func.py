@@ -15,7 +15,7 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
     StartRealTime = Signal(dict)
     StopRealTime = Signal()
     StartRecord = Signal(dict)
-    LockinSettingChanged=Signal(tuple)
+    LockinSettingChanged = Signal(tuple)
 
     def __init__(self, parent=None):
         super(Ui_SoftwareLIA_func, self).__init__(parent)
@@ -68,8 +68,7 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         self.graphicsView.setYRange(min=-10, max=10)
 
     def spinBoxChanged(self, caller: str, value: int | float):
-        self.LockinSettingChanged.emit((caller,value))
-
+        self.LockinSettingChanged.emit((caller, value))
 
     def get_all_available_input(self):
         return ['Internal']+[ch.name for ch in nidaqmx.system.Device(self.cmbDAQ.currentText()).ai_physical_chans]
@@ -139,9 +138,9 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         current_ref = self.cmbRefSignal.currentText()
         self.cmbInputSignal.addItems(
             [ch for ch in self.get_all_available_input() if (ch != current_ref) and (ch != 'Internal')])
-        
+
         ref_source = 'external' if self.cmbRefSignal.currentText() != 'Internal' else 'internal'
-        self.LockinSettingChanged.emit(('ref_source',ref_source))
+        self.LockinSettingChanged.emit(('ref_source', ref_source))
 
     def remove_item_double_click(self, item: QListWidgetItem):
         # 獲取被雙擊項目的索引
@@ -162,8 +161,14 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         }
         self.graphicsView.plotItem.addLegend()
 
-        self.curves = [self.graphicsView.plotItem.plot(
-            name=source,pen=self.color_list[idx % len(self.color_list)]) for idx,source in enumerate(self.get_selected_input())]
+        self.curves = [
+            self.graphicsView.plotItem.plot(
+                name=source,
+                pen=self.color_list[idx % len(self.color_list)],
+                symbolPen=self.color_list[idx % len(self.color_list)])
+            for idx, source in enumerate(self.get_selected_input())
+        ]
+        
         self.StartRealTime.emit(sample_setting)
 
     def start_record(self):
@@ -173,9 +178,19 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
             "ref_source": self.cmbRefSignal.currentText(),
             "source": self.get_selected_input(),
         }
+        self.graphicsView.plotItem.addLegend()
+
+        self.curves = [
+            self.graphicsView.plotItem.plot(
+                name=source,
+                pen=self.color_list[idx % len(self.color_list)],
+                symbolPen=self.color_list[idx % len(self.color_list)])
+            for idx, source in enumerate(self.get_selected_input())
+        ]
+
         self.StartRecord.emit(sample_setting)
 
-    def plot_data(self, data: dict[str,np.ndarray]):
+    def plot_data(self, data: dict[str, np.ndarray]):
         if data["theta"].ndim == 1:
             self.curves[0].setData(data["theta"])
         else:

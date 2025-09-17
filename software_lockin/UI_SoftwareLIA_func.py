@@ -1,12 +1,10 @@
 import numpy as np
 from UI_SoftwareLIA_ui import Ui_SoftwareLIA
-from PySide6.QtWidgets import QMainWindow, QListWidgetItem
+from PySide6.QtWidgets import QMainWindow, QListWidgetItem, QInputDialog, QMessageBox
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QCloseEvent
-import SoftwareLIA
 import nidaqmx
 import nidaqmx.system
-from nidaqmx.constants import AcquisitionType
 from DAQWorker import DAQWorker
 from LIAWorker import LIAWorker
 
@@ -21,7 +19,7 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         super(Ui_SoftwareLIA_func, self).__init__(parent)
         self.setupUi(self)
         # self.lockin = SoftwareLIA.LockInAmplifier(fs=1000)
-
+        
         self.daq_worker = DAQWorker()
         self.daq_thread = QThread(self)
         self.StartRealTime.connect(self.daq_worker.get_real_time_data)
@@ -32,7 +30,7 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         self.lia_worker = LIAWorker()
         self.lia_thread = QThread(self)
         self.LockinSettingChanged.connect(self.lia_worker.change_LIA_config)
-        self.daq_worker.data_acquired.connect(self.lia_worker.caluclate)
+        self.daq_worker.data_acquired.connect(self.lia_worker.calculate)
         self.lia_worker.data_calculated.connect(self.plot_data)
         # 放在這邊是因為有一些鎖相數值需要填到視窗
         self.initUi()
@@ -152,12 +150,17 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         self.set_max_sample_rate()
 
     def start_real_time(self):
+        selected_input = self.get_selected_input()
+        if len(selected_input) == 0:
+            QMessageBox.critical(self, "錯誤", "請加入至少一個輸入通道",
+                                 QMessageBox.StandardButton.Ok)
+            return
         sample_setting = {
             "SAMPLE_RATE": self.dsbSamplingRate.value(),
             "SAMPLE_PER_READ": int(self.dsbSamplingRate.value()/10),
             "daq_name": self.cmbDAQ.currentText(),
             "ref_source": self.cmbRefSignal.currentText(),
-            "source": self.get_selected_input(),
+            "source": selected_input,
         }
         self.graphicsView.plotItem.addLegend()
 
@@ -168,15 +171,24 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
                 symbolPen=self.color_list[idx % len(self.color_list)])
             for idx, source in enumerate(self.get_selected_input())
         ]
-        
+
         self.StartRealTime.emit(sample_setting)
 
     def start_record(self):
+        selected_input = self.get_selected_input()
+        if len(selected_input) == 0:
+            QMessageBox.critical(self, "錯誤", "請加入至少一個輸入通道",
+                                 QMessageBox.StandardButton.Ok)
+            return
+        reply, ok = QInputDialog.getDouble(
+            self, "量測時間", "請輸入量測時間(秒)：", 20, 0, 1000)
+        if not ok:
+            return
         sample_setting = {
             "SAMPLE_RATE": self.dsbSamplingRate.value(),
-            "MEASUREMENT_DURATION": 0,
+            "MEASUREMENT_DURATION": reply,
             "ref_source": self.cmbRefSignal.currentText(),
-            "source": self.get_selected_input(),
+            "source": selected_input,
         }
         self.graphicsView.plotItem.addLegend()
 
@@ -200,6 +212,9 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
 
     def closeEvent(self, event: QCloseEvent):
         self.StopRealTime.emit()
-        self.daq_thread.exit(0)
+        self.daq_thread.quit()
+        self.lia_thread.quit()
+        self.daq_thread.wait()
+        self.lia_thread.wait()
         event.accept()
         return super().closeEvent(event)

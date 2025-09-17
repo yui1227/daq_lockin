@@ -41,7 +41,7 @@ class LockInAmplifier:
         mode: 可為"realtime" or "record"
         return: dict 包含 I, Q, R, theta
         """
-        if len(signal) != len(ref_signal):
+        if self.ref_source=='external' and len(signal) != len(ref_signal):
             raise ValueError("signal 與 ref 必須長度相同")
 
         N = len(signal)

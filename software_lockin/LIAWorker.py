@@ -26,12 +26,12 @@ class LIAWorker(QObject):
     #         "filter_order": self.lockin.filter_order,
     #     }
 
-    def caluclate(self, data: np.ndarray, mode: str):
+    def calculate(self, data: np.ndarray, mode: str):
         if self.lockin.ref_source == 'external':
             lock_result = np.apply_along_axis(
                 self.lockin.process, axis=1, arr=data[1:, :], ref_signal=data[0, :], mode=mode)
             self.data_calculated.emit(lock_result)
         elif self.lockin.ref_source == 'internal':
             lock_result = np.apply_along_axis(
-                self.lockin.process, axis=1, arr=data, ref_signal=None, mode=mode)
+                self.lockin.process, axis=1, arr=data, ref_signal=[], mode=mode)
             self.data_calculated.emit(lock_result)

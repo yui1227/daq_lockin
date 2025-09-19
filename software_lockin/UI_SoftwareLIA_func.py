@@ -1,13 +1,13 @@
 import numpy as np
 from UI_SoftwareLIA_ui import Ui_SoftwareLIA
-from PySide6.QtWidgets import QMainWindow, QListWidgetItem, QInputDialog, QMessageBox
+from PySide6.QtWidgets import QMainWindow, QListWidgetItem, QInputDialog, QMessageBox, QApplication
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QCloseEvent
 import nidaqmx
 import nidaqmx.system
 from DAQWorker import DAQWorker
 from LIAWorker import LIAWorker
-
+import sys
 
 class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
     StartRealTime = Signal(dict)
@@ -33,6 +33,8 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         self.daq_worker.data_acquired.connect(self.lia_worker.calculate)
         self.lia_worker.data_calculated.connect(self.plot_data)
         # 放在這邊是因為有一些鎖相數值需要填到視窗
+        if not self.detect_nidaqmx():
+            sys.exit(1)
         self.initUi()
 
         self.daq_worker.moveToThread(self.daq_thread)
@@ -48,6 +50,14 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
             (255, 0, 255),  # 紫
             (255, 128, 0)   # 橘
         ]
+
+    def detect_nidaqmx(self)-> bool:
+        try:
+            system = nidaqmx.system.System.local()
+        except Exception as e:
+            QMessageBox.critical(self,"錯誤！",f"找不到NI DAQmx，請先安裝NI DAQmx\n{e}")
+            return False
+        return True
 
     def initUi(self):
         for dev in nidaqmx.system.System.local().devices:

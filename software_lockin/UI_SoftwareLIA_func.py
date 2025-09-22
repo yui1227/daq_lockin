@@ -9,6 +9,7 @@ from DAQWorker import DAQWorker
 from LIAWorker import LIAWorker
 import sys
 
+
 class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
     StartRealTime = Signal(dict)
     StopRealTime = Signal()
@@ -18,14 +19,12 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
     def __init__(self, parent=None):
         super(Ui_SoftwareLIA_func, self).__init__(parent)
         self.setupUi(self)
-        # self.lockin = SoftwareLIA.LockInAmplifier(fs=1000)
-        
+
         self.daq_worker = DAQWorker()
         self.daq_thread = QThread(self)
         self.StartRealTime.connect(self.daq_worker.get_real_time_data)
         self.StopRealTime.connect(self.daq_worker.stop_real_time)
         self.StartRecord.connect(self.daq_worker.get_record_data)
-        # self.daq_worker.data_acquired.connect(self.plot_data)
 
         self.lia_worker = LIAWorker()
         self.lia_thread = QThread(self)
@@ -51,15 +50,24 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
             (255, 128, 0)   # 橘
         ]
 
-    def detect_nidaqmx(self)-> bool:
+    def detect_nidaqmx(self) -> bool:
         try:
             system = nidaqmx.system.System.local()
         except Exception as e:
-            QMessageBox.critical(self,"錯誤！",f"找不到NI DAQmx，請先安裝NI DAQmx\n{e}")
+            QMessageBox.critical(self, "錯誤！", f"找不到NI DAQmx，請先安裝NI DAQmx\n{e}")
+            return False
+        return True
+
+    def detect_daq(self) -> bool:
+        if len(nidaqmx.system.System.local().devices) == 0:
+            QMessageBox.critical(self, "錯誤！", f"請連接NI DAQ")
             return False
         return True
 
     def initUi(self):
+        if not self.detect_daq():
+            sys.exit(1)
+
         for dev in nidaqmx.system.System.local().devices:
             self.cmbDAQ.addItem(dev.name)
         self.event_bind()
@@ -166,8 +174,8 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
                                  QMessageBox.StandardButton.Ok)
             return
         sample_setting = {
-            "SAMPLE_RATE": self.dsbSamplingRate.value(),
-            "SAMPLE_PER_READ": int(self.dsbSamplingRate.value()/10),
+            "SAMPLE_RATE": self.dsbSamplingRate.value()*10,
+            "SAMPLE_PER_READ": int(self.dsbSamplingRate.value()),
             "daq_name": self.cmbDAQ.currentText(),
             "ref_source": self.cmbRefSignal.currentText(),
             "source": selected_input,
@@ -216,15 +224,13 @@ class Ui_SoftwareLIA_func(QMainWindow, Ui_SoftwareLIA):
         if data["theta"].ndim == 1:
             self.curves[0].setData(data["theta"])
         else:
-            start = 0 if self.cmbRefSignal.currentText() == 'Internal' else 1
-            for row in range(start, data["theta"].shape[0]):
-                self.curves[row-start].setData(data["theta"][row, :])
+            for row in range(data["theta"].shape[0]):
+                self.curves[row].setData(data["theta"][row, :])
 
     def closeEvent(self, event: QCloseEvent):
         self.StopRealTime.emit()
-        self.daq_thread.quit()
-        self.lia_thread.quit()
-        self.daq_thread.wait()
-        self.lia_thread.wait()
+        self.daq_thread.requestInterruption()
+        self.daq_thread.exit(0)
+        self.lia_thread.exit(0)
         event.accept()
         return super().closeEvent(event)

@@ -37,6 +37,8 @@ class DAQWorker(QObject):
                 new_data = [new_data]
             new_data = np.array(new_data)
             self.data_acquired.emit(new_data, "realtime")
+            if self.thread().isInterruptionRequested():
+                break
         task.stop()
         task.close()
 

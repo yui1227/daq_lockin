@@ -21,11 +21,11 @@ except ImportError as e:
 #              實驗參數設定
 # ==========================================
 # 共通參數
-DURATION = 20.0       # 擷取時間 (秒)
+DURATION = 60.0       # 擷取時間 (秒)
 TIME_CONSTANT = 0.001 # 時間常數 1 ms (軟體與硬體皆設為此值)
 
 # --- NI DAQ (軟體鎖相) 設定 ---
-DAQ_SAMPLING_RATE = 10000.0 # 10 kHz (量測頻率固定)
+DAQ_SAMPLING_RATE = 9765.625 # 10 kHz (量測頻率固定)
 DAQ_DEV = "Dev1"            # DAQ 設備名稱
 DAQ_REF_CH = "ai7"          # 參考訊號輸入通道
 DAQ_SIG_CH = "ai19"         # 待測訊號輸入通道
@@ -34,6 +34,7 @@ DAQ_VOLTAGE_RANGE = 10.0    # DAQ 輸入範圍 (+-10V)
 # --- SR865A (硬體鎖相) 設定 ---
 VISA_ADDRESS = "USB0::0xB506::0x2000::004937::INSTR" # 請修改為您的 SR865A VISA 位址
 SR865A_SENSITIVITY = 0.2    # 200 mV
+# Max Rate 會根據時間常數調整
 # Rate Index 說明: Rate = MaxRate / 2^n
 # 建議值: 10~12 (約 500Hz ~ 2kHz)
 # 若設太低 (頻率太高) 可能導致 SR865A 內部 Buffer (4MB) 在 20秒內爆滿
@@ -251,10 +252,10 @@ if __name__ == "__main__":
     plt.subplot(2, 1, 1)
     plt.title(f"Lock-in Comparison (Duration: {DURATION}s, TC: {TIME_CONSTANT}s)")
     
-    plt.plot(res_soft['time'], res_soft['R'], label=f"Software (DAQ 10kHz)", 
+    plt.plot(res_soft['time'], res_soft['R'], label=f"Software (DAQ {DAQ_SAMPLING_RATE}Hz)", 
              color='blue', alpha=0.6, linewidth=1,marker='.',linestyle='None')
 
-    plt.plot(res_hard['time'], res_hard['R'], label=f"Hardware (SR865A {res_hard['fs']:.0f}Hz)", 
+    plt.plot(res_hard['time'], res_hard['R'], label=f"Hardware (SR865A {res_hard['fs']}Hz)", 
              color='orange', alpha=0.8, linewidth=1,marker='.',linestyle='None')
 
     plt.ylabel("Amplitude R (Vrms)")

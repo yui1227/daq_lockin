@@ -13,5 +13,4 @@ pg.ipynb
 .venv
 
 # data files
-sr865a_*.txt
-daq_*.txt
+*.csv

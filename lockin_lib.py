@@ -94,9 +94,12 @@ class SoftwareLockInAmplifier:
         x_filtered = self._butter_lowpass_filter(x_raw, cutoff_freq)
         y_filtered = self._butter_lowpass_filter(y_raw, cutoff_freq)
         
-        # 計算振幅 R 和 相位 Theta
-        r = np.sqrt(x_filtered**2 + y_filtered**2)
+        # 計算峰值振幅 R_peak
+        r_peak = np.sqrt(x_filtered**2 + y_filtered**2)
+        
+        # --- 修改處：轉換為 RMS 以匹配硬體鎖相放大器 ---
+        r_rms = r_peak / np.sqrt(2)
         # 計算相位 (弧度轉角度)
         theta = np.arctan2(y_filtered, x_filtered) * (180 / np.pi)
         
-        return r, theta
+        return r_rms, theta

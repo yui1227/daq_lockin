@@ -7,7 +7,7 @@ from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import nidaqmx
-from nidaqmx.constants import AcquisitionType
+from nidaqmx.constants import AcquisitionType,TerminalConfiguration
 
 # 匯入您提供的函式庫
 try:
@@ -21,14 +21,14 @@ except ImportError as e:
 #              實驗參數設定
 # ==========================================
 # 共通參數
-DURATION = 60.0       # 擷取時間 (秒)
+DURATION = 20.0       # 擷取時間 (秒)
 TIME_CONSTANT = 0.001 # 時間常數 1 ms (軟體與硬體皆設為此值)
 
 # --- NI DAQ (軟體鎖相) 設定 ---
 DAQ_SAMPLING_RATE = 9765.625 # 10 kHz (量測頻率固定)
 DAQ_DEV = "Dev1"            # DAQ 設備名稱
-DAQ_REF_CH = "ai7"          # 參考訊號輸入通道
-DAQ_SIG_CH = "ai19"         # 待測訊號輸入通道
+DAQ_REF_CH = "ai2"          # 參考訊號輸入通道
+DAQ_SIG_CH = "ai3"         # 待測訊號輸入通道
 DAQ_VOLTAGE_RANGE = 10.0    # DAQ 輸入範圍 (+-10V)
 
 # --- SR865A (硬體鎖相) 設定 ---
@@ -55,11 +55,13 @@ def task_software_lockin(result_queue):
         with nidaqmx.Task() as task:
             task.ai_channels.add_ai_voltage_chan(
                 f"{DAQ_DEV}/{DAQ_REF_CH}", 
-                min_val=-DAQ_VOLTAGE_RANGE, max_val=DAQ_VOLTAGE_RANGE
+                min_val=-DAQ_VOLTAGE_RANGE, max_val=DAQ_VOLTAGE_RANGE,
+                terminal_config=TerminalConfiguration.DIFF
             )
             task.ai_channels.add_ai_voltage_chan(
                 f"{DAQ_DEV}/{DAQ_SIG_CH}", 
-                min_val=-DAQ_VOLTAGE_RANGE, max_val=DAQ_VOLTAGE_RANGE
+                min_val=-DAQ_VOLTAGE_RANGE, max_val=DAQ_VOLTAGE_RANGE,
+                terminal_config=TerminalConfiguration.DIFF
             )
 
             n_samples = int(DAQ_SAMPLING_RATE * DURATION)
@@ -253,10 +255,10 @@ if __name__ == "__main__":
     plt.title(f"Lock-in Comparison (Duration: {DURATION}s, TC: {TIME_CONSTANT}s)")
     
     plt.plot(res_soft['time'], res_soft['R'], label=f"Software (DAQ {DAQ_SAMPLING_RATE}Hz)", 
-             color='blue', alpha=0.6, linewidth=1,marker='.',linestyle='None')
+             color='blue', alpha=0.6, linewidth=1)
 
     plt.plot(res_hard['time'], res_hard['R'], label=f"Hardware (SR865A {res_hard['fs']}Hz)", 
-             color='orange', alpha=0.8, linewidth=1,marker='.',linestyle='None')
+             color='orange', alpha=0.8, linewidth=1)
 
     plt.ylabel("Amplitude R (Vrms)")
     plt.grid(True)
@@ -266,10 +268,10 @@ if __name__ == "__main__":
     plt.subplot(2, 1, 2)
     
     plt.plot(res_soft['time'], res_soft['Theta'], label="Software", 
-             color='blue', alpha=0.6, linewidth=1,marker='.',linestyle='None')
+             color='blue', alpha=0.6, linewidth=1)
     
     plt.plot(res_hard['time'], res_hard['Theta'], label="Hardware", 
-             color='orange', alpha=0.8, linewidth=1,marker='.',linestyle='None')
+             color='orange', alpha=0.8, linewidth=1)
     
     plt.ylabel("Phase Theta (deg)")
     plt.xlabel("Time (s)")

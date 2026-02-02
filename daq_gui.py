@@ -19,7 +19,7 @@ except ImportError:
 # 嘗試匯入 NI DAQ，如果沒有安裝則只能用模擬模式
 try:
     import nidaqmx
-    from nidaqmx.constants import AcquisitionType
+    from nidaqmx.constants import AcquisitionType, TerminalConfiguration
     NIDAQ_AVAILABLE = True
 except ImportError:
     NIDAQ_AVAILABLE = False
@@ -186,7 +186,8 @@ class LockinApp:
         # 繪製參考訊號 (只畫前段以免太密)
         # zoom = min(1000, n_samples)
         # self.axs[0].plot(t[:zoom], ref_data[:zoom], 'k', alpha=0.5, label='Ref (Zoom)')
-        self.axs[0].plot(t, ref_data, 'k', alpha=0.5, label='Ref', marker='.',ls=None)
+        self.axs[0].plot(t, ref_data, 'k', alpha=0.5,
+                         label='Ref')
 
         # 繪製各通道結果
         colors = ['b', 'r', 'g', 'm']
@@ -194,13 +195,14 @@ class LockinApp:
             c = colors[i % len(colors)]
             # 原始訊號
             self.axs[0].plot(t, res["raw"], c=c,
-                             label=f'{res["name"]} Raw', marker='.',ls=None)
+                             label=f'{res["name"]} Raw')
             # self.axs[0].plot(t[:zoom], res["raw"][:zoom], c=c, label=f'{res["name"]} Raw')
             # 振幅
-            self.axs[1].plot(t, res["R"], c=c, label=res["name"], marker='.',ls=None)
+            self.axs[1].plot(t, res["R"], c=c,
+                             label=res["name"])
             # 相位
             self.axs[2].plot(t, res["Theta"], c=c,
-                             label=res["name"], marker='.',ls=None)
+                             label=res["name"])
 
         # 設定圖表標籤
         self.axs[0].set_title(
@@ -304,10 +306,10 @@ class LockinApp:
             with nidaqmx.Task() as task:
                 # 設定通道
                 task.ai_channels.add_ai_voltage_chan(
-                    f"{dev}/{ref_ch}", min_val=-vol_range, max_val=vol_range)
+                    f"{dev}/{ref_ch}", min_val=-vol_range, max_val=vol_range, terminal_config=TerminalConfiguration.DIFF)
                 for ch in sig_chs:
                     task.ai_channels.add_ai_voltage_chan(
-                        f"{dev}/{ch}", min_val=-vol_range, max_val=vol_range)
+                        f"{dev}/{ch}", min_val=-vol_range, max_val=vol_range, terminal_config=TerminalConfiguration.DIFF)
 
                 n_samples = int(fs * duration)
                 task.timing.cfg_samp_clk_timing(

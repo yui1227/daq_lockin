@@ -172,11 +172,11 @@ def save_comparison_to_csv(filename, res_soft, res_hard):
             writer = csv.writer(f)
             
             # 寫入實驗資訊表頭
-            writer.writerow(["# Experiment Comparison Data"])
-            writer.writerow([f"# Date: {datetime.now().isoformat()}"])
-            writer.writerow([f"# Software Params: FS={DAQ_SAMPLING_RATE}Hz, TC={TIME_CONSTANT}s"])
-            writer.writerow([f"# Hardware Params: FS={res_hard['fs']:.2f}Hz, TC={TIME_CONSTANT}s, Sens={SR865A_SENSITIVITY}V"])
-            writer.writerow([]) # 空行
+            # writer.writerow(["# Experiment Comparison Data"])
+            # writer.writerow([f"# Date: {datetime.now().isoformat()}"])
+            # writer.writerow([f"# Software Params: FS={DAQ_SAMPLING_RATE}Hz, TC={TIME_CONSTANT}s"])
+            # writer.writerow([f"# Hardware Params: FS={res_hard['fs']:.2f}Hz, TC={TIME_CONSTANT}s, Sens={SR865A_SENSITIVITY}V"])
+            # writer.writerow([]) # 空行
             
             # 寫入欄位名稱
             writer.writerow(headers)

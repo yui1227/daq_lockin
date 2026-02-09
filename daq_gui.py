@@ -43,15 +43,15 @@ class LockinApp:
         # 參數輸入區
         self.create_input(control_frame, "採樣率 (Hz):", "10000", 0, 0)
         self.create_input(control_frame, "擷取時間 (s):", "10.0", 0, 1)
-        self.create_input(control_frame, "時間常數 (s):", "0.001", 0, 2)
+        self.create_input(control_frame, "時間常數 (s):", "0.01", 0, 2)
 
         # 設備設定
         self.create_input(control_frame, "設備名稱:", "Dev1", 1, 0)
-        self.create_input(control_frame, "參考通道:", "ai7", 1, 1)
-        self.create_input(control_frame, "訊號通道 (逗號隔開):", "ai19", 1, 2)
+        self.create_input(control_frame, "參考通道:", "ai3", 1, 1)
+        self.create_input(control_frame, "訊號通道 (逗號隔開):", "ai7, ai19, ai23", 1, 2)
 
         range_frame = ttk.LabelFrame(
-            control_frame, text="訊號通道輸入範圍 (Signal Input Range)")
+            control_frame, text="所有訊號通道輸入範圍 (All Signal Input Range)")
         range_frame.grid(row=2, column=0, columnspan=3, sticky="ew", pady=10)
 
         ranges = [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0]
